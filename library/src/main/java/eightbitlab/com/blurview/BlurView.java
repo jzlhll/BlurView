@@ -52,7 +52,16 @@ public class BlurView extends FrameLayout {
     private void init(AttributeSet attrs, int defStyleAttr) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.BlurView, defStyleAttr, 0);
         overlayColor = a.getColor(R.styleable.BlurView_blurOverlayColor, TRANSPARENT);
+        int blurGradient = a.getInt(R.styleable.BlurView_blurGradient, GRADIENT_NONE);
+        int overlayGradientStartColor = a.getColor(R.styleable.BlurView_blurOverlayGradientStartColor, TRANSPARENT);
+        int overlayGradientEndColor = a.getColor(R.styleable.BlurView_blurOverlayGradientEndColor, TRANSPARENT);
+        int overlayGradientDirection = a.getInt(R.styleable.BlurView_blurOverlayGradientDirection, GRADIENT_NONE);
         a.recycle();
+
+        setBlurGradient(blurGradient);
+        if (overlayGradientStartColor != TRANSPARENT || overlayGradientEndColor != TRANSPARENT) {
+            setOverlayGradientColor(overlayGradientStartColor, overlayGradientEndColor, overlayGradientDirection);
+        }
     }
 
     @Override

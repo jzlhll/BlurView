@@ -2,5 +2,21 @@
 <resources>
     <declare-styleable name="BlurView">
         <attr name="blurOverlayColor" format="color"/>
+        <attr name="blurGradient" format="enum">
+            <enum name="none" value="0"/>
+            <enum name="topToBottom" value="1"/>
+            <enum name="bottomToTop" value="2"/>
+            <enum name="leftToRight" value="3"/>
+            <enum name="rightToLeft" value="4"/>
+        </attr>
+        <attr name="blurOverlayGradientStartColor" format="color"/>
+        <attr name="blurOverlayGradientEndColor" format="color"/>
+        <attr name="blurOverlayGradientDirection" format="enum">
+            <enum name="none" value="0"/>
+            <enum name="topToBottom" value="1"/>
+            <enum name="bottomToTop" value="2"/>
+            <enum name="leftToRight" value="3"/>
+            <enum name="rightToLeft" value="4"/>
+        </attr>
     </declare-styleable>
 </resources>
