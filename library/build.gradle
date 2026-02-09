@@ -1,6 +1,8 @@
-apply plugin: 'com.android.library'
-apply plugin: 'de.mannodermaus.android-junit5'
-apply plugin: 'maven-publish'
+plugins {
+    id 'com.android.library'
+    id 'de.mannodermaus.android-junit5'
+    id("com.vanniktech.maven.publish") version "0.36.0"
+}
 
 android {
     compileSdkVersion 36
@@ -40,58 +42,55 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
 }
 
-task androidJavadocs(type: Javadoc) {
-    failOnError = false
-    source = android.sourceSets.main.java.srcDirs
-    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-    classpath += files(ext.androidJar)
+//task androidJavadocs(type: Javadoc) {
+//    failOnError = false
+//    source = android.sourceSets.main.java.srcDirs
+//    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+//    classpath += files(ext.androidJar)
+//}
+//
+//task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+//    from androidJavadocs.destinationDir
+//    archiveClassifier = 'javadoc'
+//}
+//
+//task androidSourcesJar(type: Jar) {
+//    from android.sourceSets.main.java.srcDirs
+//    archiveClassifier = 'sources'
+//}
+
+mavenPublishing {
+    publishToMavenCentral()
+
+    signAllPublications()
 }
 
-task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    from androidJavadocs.destinationDir
-    archiveClassifier = 'javadoc'
-}
+mavenPublishing {
+    coordinates("io.github.jzlhll", "blurview", "0.0.1")
 
-task androidSourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    archiveClassifier = 'sources'
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.github.Dimezis'
-            artifactId = 'BlurView' 
-            version = "3.2.0"
-            
-            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar") {
-                builtBy assemble
+    pom {
+        name = "blurview"
+        description = "Clone from eightbitlab and support gradient blur."
+        inceptionYear = "2026"
+        url = "https://github.com/jzlhll/BlurView"
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
             }
-            artifact androidSourcesJar
-            artifact androidJavadocsJar
-            
-            pom {
-                name = 'BlurView'
-                description = 'Dynamic iOS-like blur on Android'
-                url = 'https://github.com/Dimezis/BlurView'
-                
-                licenses {
-                    license {
-                        name = 'Apache License, Version 2.0'
-                        url = 'https://opensource.org/license/apache-2-0'
-                    }
-                }
-                
-                developers {
-                    developer {
-                        id = 'dimezis'
-                        name = 'Dmytro Saviuk'
-                    }
-                }
+        }
+        developers {
+            developer {
+                id = "jzlhll"
+                name = "jzlhll"
+                url = "https://github.com/jzlhll/"
             }
+        }
+        scm {
+            url = "https://github.com/jzlhll/BlurView"
+            connection = "scm:git:git://github.com/jzlhll/BlurView.git"
+            developerConnection = "scm:git:ssh://git@github.com/jzlhll/BlurView.git"
         }
     }
 }
-
-// Task to be run by JitPack
-task install(dependsOn: publishToMavenLocal)

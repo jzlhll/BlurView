@@ -22,6 +22,12 @@ import com.eightbitlab.blurview.R;
  */
 public class BlurView extends FrameLayout {
 
+    public static final int GRADIENT_NONE = 0;
+    public static final int GRADIENT_TOP_TO_BOTTOM = 1;
+    public static final int GRADIENT_BOTTOM_TO_TOP = 2;
+    public static final int GRADIENT_LEFT_TO_RIGHT = 3;
+    public static final int GRADIENT_RIGHT_TO_LEFT = 4;
+
     BlurController blurController = new NoOpController();
 
     @ColorInt
@@ -163,6 +169,20 @@ public class BlurView extends FrameLayout {
      */
     public BlurViewFacade setBlurEnabled(boolean enabled) {
         return blurController.setBlurEnabled(enabled);
+    }
+
+    /**
+     * @see BlurViewFacade#setBlurGradient(int)
+     */
+    public BlurViewFacade setBlurGradient(int direction) {
+        return blurController.setBlurGradient(direction);
+    }
+
+    /**
+     * @see BlurViewFacade#setOverlayGradientColor(int, int, int)
+     */
+    public BlurViewFacade setOverlayGradientColor(@ColorInt int startColor, @ColorInt int endColor, int direction) {
+        return blurController.setOverlayGradientColor(startColor, endColor, direction);
     }
 
     @Override

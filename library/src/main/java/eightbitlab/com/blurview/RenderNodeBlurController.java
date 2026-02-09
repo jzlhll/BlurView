@@ -1,8 +1,11 @@
 package eightbitlab.com.blurview;
 
 import android.graphics.Bitmap;
+import android.graphics.BlendMode;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
 import android.graphics.RecordingCanvas;
 import android.graphics.RenderEffect;
 import android.graphics.RenderNode;
@@ -31,8 +34,17 @@ public class RenderNodeBlurController implements BlurController {
 
     private Drawable frameClearDrawable;
     private int overlayColor;
+    private int overlayStartColor = Color.TRANSPARENT;
+    private int overlayEndColor = Color.TRANSPARENT;
+    private int overlayGradientDirection = BlurView.GRADIENT_NONE;
+    private final Paint overlayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
     private float blurRadius = 1f;
     private boolean enabled = true;
+    private int gradientDirection = BlurView.GRADIENT_NONE;
+
+    private final GradientCache gradientCache = new GradientCache();
+    private final OverlayGradientCache overlayGradientCache = new OverlayGradientCache();
 
     // Potentially cached stuff from the slow software path
     @Nullable
@@ -96,7 +108,21 @@ public class RenderNodeBlurController implements BlurController {
         if (applyNoise) {
             Noise.apply(canvas, blurView.getContext(), blurView.getWidth(), blurView.getHeight());
         }
-        if (overlayColor != Color.TRANSPARENT) {
+        if (overlayStartColor != Color.TRANSPARENT || overlayEndColor != Color.TRANSPARENT) {
+            int w = blurView.getWidth();
+            int h = blurView.getHeight();
+            if (w > 0 && h > 0) {
+                // If gradient direction is NONE, we can't draw a meaningful gradient unless we default it.
+                // Assuming we default to TOP_TO_BOTTOM if NONE, OR we don't draw.
+                // But for "overlay" it might be better to just draw solid startColor if NONE.
+                // However, user asked for gradient. Let's use TOP_TO_BOTTOM as default fallback if needed,
+                // or just rely on gradientDirection being set.
+                // Given the context of "progressive blur", we assume direction matches blur direction.
+                Shader shader = overlayGradientCache.getShader(w, h, overlayStartColor, overlayEndColor, overlayGradientDirection);
+                overlayPaint.setShader(shader);
+                canvas.drawRect(0, 0, w, h, overlayPaint);
+            }
+        } else if (overlayColor != Color.TRANSPARENT) {
             canvas.drawColor(overlayColor);
         }
         canvas.restore();
@@ -194,6 +220,7 @@ public class RenderNodeBlurController implements BlurController {
     @Override
     public void updateBlurViewSize() {
         // No-op, the size is updated in draw method, it's cheap and not called frequently
+        //todo applyBlur();
     }
 
     @Override
@@ -239,13 +266,194 @@ public class RenderNodeBlurController implements BlurController {
         // because RenderEffect already scales down the snapshot when needed.
         float realBlurRadius = blurRadius * scaleFactor;
         RenderEffect blur = RenderEffect.createBlurEffect(realBlurRadius, realBlurRadius, Shader.TileMode.CLAMP);
+
+        if (gradientDirection != BlurView.GRADIENT_NONE && blurView.getWidth() > 0 && blurView.getHeight() > 0) {
+            int w = blurView.getWidth();
+            int h = blurView.getHeight();
+            Shader gradient = gradientCache.getShader(w, h, getLeft(), getTop(), gradientDirection);
+            if (gradient != null) {
+                RenderEffect mask = RenderEffect.createShaderEffect(gradient);
+                blur = RenderEffect.createBlendModeEffect(blur, mask, BlendMode.DST_IN);
+            }
+        }
+
         blurNode.setRenderEffect(blur);
+    }
+
+    private static class OverlayGradientCache {
+        @Nullable
+        private Shader shader;
+        int w;
+        int h;
+        int startColor;
+        int endColor;
+        int direction = -1;
+
+        @Nullable
+        Shader getShader(int w, int h, int startColor, int endColor, int gradientDirection) {
+            // Check if cache is valid
+            if (isCacheValid(w, h, startColor, endColor, gradientDirection)) {
+                return shader;
+            }
+
+            // Cache miss, create new shader
+            float right = w;
+            float bottom = h;
+
+            Shader shader;
+            switch (gradientDirection) {
+                case BlurView.GRADIENT_TOP_TO_BOTTOM:
+                    shader = new LinearGradient(0, 0, 0, bottom, startColor, endColor, Shader.TileMode.CLAMP);
+                    break;
+                case BlurView.GRADIENT_BOTTOM_TO_TOP:
+                    shader = new LinearGradient(0, bottom, 0, 0, startColor, endColor, Shader.TileMode.CLAMP);
+                    break;
+                case BlurView.GRADIENT_LEFT_TO_RIGHT:
+                    shader = new LinearGradient(0, 0, right, 0, startColor, endColor, Shader.TileMode.CLAMP);
+                    break;
+                case BlurView.GRADIENT_RIGHT_TO_LEFT:
+                    shader = new LinearGradient(right, 0, 0, 0, startColor, endColor, Shader.TileMode.CLAMP);
+                    break;
+                default:
+                    // Fallback or default for NONE? 
+                    // Let's assume Top-to-Bottom as a sensible default for an explicit gradient request
+                    // Or maybe we should just return null?
+                    // User said "linear transparency function", implying vertical usually.
+                    shader = new LinearGradient(0, 0, 0, bottom, startColor, endColor, Shader.TileMode.CLAMP);
+                    break;
+            }
+
+            // Update cache
+            update(shader, w, h, startColor, endColor, gradientDirection);
+
+            return shader;
+        }
+
+        private boolean isCacheValid(int w, int h, int startColor, int endColor, int direction) {
+            return shader != null &&
+                    this.w == w &&
+                    this.h == h &&
+                    this.startColor == startColor &&
+                    this.endColor == endColor &&
+                    this.direction == direction;
+        }
+
+        private void update(Shader shader, int w, int h, int startColor, int endColor, int direction) {
+            this.shader = shader;
+            this.w = w;
+            this.h = h;
+            this.startColor = startColor;
+            this.endColor = endColor;
+            this.direction = direction;
+        }
+    }
+
+    private static class GradientCache {
+        @Nullable
+        private Shader shader;
+        int w;
+        int h;
+        int left;
+        int top;
+        int direction = -1;
+
+        @Nullable
+        Shader getShader(int w, int h, int currentLeft, int currentTop, int gradientDirection) {
+            if (gradientDirection == BlurView.GRADIENT_NONE) {
+                shader = null;
+                return null;
+            }
+
+            // Check if cache is valid
+            if (isCacheValid(w, h, currentLeft, currentTop, gradientDirection)) {
+                return shader;
+            }
+
+            // Cache miss, create new shader
+            // Colors: Opaque to Transparent
+            // Opaque keeps the blur, Transparent removes it (shows underlying sharp content)
+            int c1 = Color.BLACK;
+            int c2 = Color.TRANSPARENT;
+
+            float left = currentLeft;
+            float top = currentTop;
+            float right = left + w;
+            float bottom = top + h;
+
+            Shader linearGradient;
+            switch (gradientDirection) {
+                case BlurView.GRADIENT_TOP_TO_BOTTOM:
+                    // Top: Blur (Opaque), Bottom: Sharp (Transparent)
+                    linearGradient = new LinearGradient(0, top, 0, bottom, c1, c2, Shader.TileMode.CLAMP);
+                    break;
+                case BlurView.GRADIENT_BOTTOM_TO_TOP:
+                    linearGradient = new LinearGradient(0, bottom, 0, top, c1, c2, Shader.TileMode.CLAMP);
+                    break;
+                case BlurView.GRADIENT_LEFT_TO_RIGHT:
+                    linearGradient = new LinearGradient(left, 0, right, 0, c1, c2, Shader.TileMode.CLAMP);
+                    break;
+                case BlurView.GRADIENT_RIGHT_TO_LEFT:
+                    linearGradient = new LinearGradient(right, 0, left, 0, c1, c2, Shader.TileMode.CLAMP);
+                    break;
+                default:
+                    linearGradient = null;
+                    break;
+            }
+
+            shader = linearGradient;
+
+            // Update cache
+            update(shader, w, h, currentLeft, currentTop, gradientDirection);
+
+            return shader;
+        }
+
+        private boolean isCacheValid(int w, int h, int left, int top, int direction) {
+            return shader != null &&
+                    this.w == w &&
+                    this.h == h &&
+                    this.left == left &&
+                    this.top == top &&
+                    this.direction == direction;
+        }
+
+        private void update(Shader shader, int w, int h, int left, int top, int direction) {
+            this.shader = shader;
+            this.w = w;
+            this.h = h;
+            this.left = left;
+            this.top = top;
+            this.direction = direction;
+        }
+    }
+
+    @Override
+    public BlurViewFacade setBlurGradient(int direction) {
+        if (this.gradientDirection != direction) {
+            this.gradientDirection = direction;
+            applyBlur();
+        }
+        return this;
     }
 
     @Override
     public BlurViewFacade setOverlayColor(int overlayColor) {
         if (this.overlayColor != overlayColor) {
             this.overlayColor = overlayColor;
+            // Clear gradient colors to prefer solid color if this is called last
+            this.overlayStartColor = Color.TRANSPARENT;
+            this.overlayEndColor = Color.TRANSPARENT;
+            blurView.invalidate();
+        }
+        return this;
+    }
+
+    @Override
+    public BlurViewFacade setOverlayGradientColor(int startColor, int endColor, int direction) {
+        if (this.overlayStartColor != startColor || this.overlayEndColor != endColor || this.overlayGradientDirection != direction) {
+            this.overlayStartColor = startColor;
+            this.overlayEndColor = endColor;
+            this.overlayGradientDirection = direction;
             blurView.invalidate();
         }
         return this;
