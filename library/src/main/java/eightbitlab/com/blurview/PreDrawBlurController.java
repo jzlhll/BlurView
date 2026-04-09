@@ -3,16 +3,18 @@ package eightbitlab.com.blurview;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
+import android.view.ViewTreeObserver;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
+import androidx.annotation.Nullable;
 /**
  * Blur Controller that handles all blur logic for the attached View.
  * It honors View size changes, View animation and Visibility changes.
@@ -40,6 +42,7 @@ public final class PreDrawBlurController implements BlurController {
     @SuppressWarnings("WeakerAccess")
     final View blurView;
     private int overlayColor;
+
     private final ViewGroup rootView;
     private final int[] rootLocation = new int[2];
     private final int[] blurViewLocation = new int[2];
@@ -244,6 +247,11 @@ public final class PreDrawBlurController implements BlurController {
                 blurView.getViewTreeObserver().addOnPreDrawListener(drawListener);
             }
         }
+        return this;
+    }
+
+    @Override
+    public BlurViewFacade setBlurGradient(int direction) {
         return this;
     }
 
