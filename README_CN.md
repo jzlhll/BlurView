@@ -4,6 +4,16 @@
 
 克隆自 [Dimezis/BlurView](https://github.com/Dimezis/BlurView)，新增了对 **渐变模糊 (Gradient/Progressive Blur)** 的支持，并提供了一个实用的 **`BlurView3Util`** 工具类，以简化配置和向下兼容处理。
 
+## 引入依赖
+
+在你的 module 级 `build.gradle` 中添加以下依赖：
+
+```gradle
+dependencies {
+    implementation 'io.github.jzlhll:blurview:3.2.1'
+}
+```
+
 ## 新增特性
 
 - **渐变模糊 (Gradient/Progressive Blur)**：支持有方向的模糊渐变（例如从上到下、从左到右），使模糊部分和清晰部分之间的过渡更加自然。

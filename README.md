@@ -4,6 +4,16 @@
 
 Cloned from [Dimezis/BlurView](https://github.com/Dimezis/BlurView) with added support for **Gradient/Progressive Blur** and a new utility class **`BlurView3Util`** for easier setup and backward compatibility.
 
+## Dependency
+
+Add this to your module's `build.gradle`:
+
+```gradle
+dependencies {
+    implementation 'io.github.jzlhll:blurview:3.2.1'
+}
+```
+
 ## What's New
 
 - **Gradient/Progressive Blur**: Supports directional blur fading (e.g., Top to Bottom, Left to Right) to smoothly transition between blurred and sharp content.
