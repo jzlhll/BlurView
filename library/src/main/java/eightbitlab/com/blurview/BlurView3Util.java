@@ -9,7 +9,7 @@ import android.view.ViewOutlineProvider;
 import androidx.annotation.RequiresApi;
 
 /**
- * 模糊背景
+ * Blur background
  */
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class BlurView3Util {
@@ -23,8 +23,8 @@ public class BlurView3Util {
 
     /**
      * @param blurView BlurView
-     * @param cornerRadius BlurView的圆角, 注意不需要 dp转换，内部处理。
-     * @param blurRadius 模糊半径
+     * @param cornerRadius BlurView corner radius. Note: no dp conversion needed, handled internally.
+     * @param blurRadius Blur radius
      */
     public BlurView3Util(BlurView blurView, int cornerRadius, float blurRadius) {
         this.blurView = blurView;
@@ -43,10 +43,10 @@ public class BlurView3Util {
     }
 
     /**
-     * 设置常规模糊
+     * Set standard blur
      *
-     * @param target 模糊目标
-     * @param legacyBgColor 过时的替代颜色
+     * @param target Blur target
+     * @param legacyBgColor Legacy fallback color
      */
     public void setBlur(BlurTarget target, int legacyBgColor) {
         if (!isLegacy) {
@@ -66,13 +66,13 @@ public class BlurView3Util {
     }
 
     /**
-     * 设置渐进模糊
+     * Set progressive blur
      *
-     * @param target 模糊目标
-     * @param direction 模糊方向
-     * @param applyNoise 是否应用噪点，推荐false，否则会有明显的分界线
-     * @param legacyBgStartColor 过时的替代开始颜色
-     * @param legacyBgEndColor 过时的替代结束颜色
+     * @param target Blur target
+     * @param direction Blur direction
+     * @param applyNoise Whether to apply noise, false is recommended, otherwise there will be a visible boundary
+     * @param legacyBgStartColor Legacy fallback start color
+     * @param legacyBgEndColor Legacy fallback end color
      */
     public void setProgressiveBlur(BlurTarget target, int direction, boolean applyNoise,
                                    int legacyBgStartColor, int legacyBgEndColor) {

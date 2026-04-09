@@ -18,7 +18,7 @@ import java.util.List;
 public class ViewBackgroundJavaBuilder {
 
     /**
-     * 圆角
+     * Corner radius
      */
     public static abstract class CornerRadius {
         public static class AllCornerRadius extends CornerRadius {
@@ -120,18 +120,18 @@ public class ViewBackgroundJavaBuilder {
     }
 
     /**
-     * 设置线性渐变背景
-     * @param startColor 渐变开始颜色
-     * @param endColor 渐变结束颜色
-     * @param angle 渐变角度。虽然支持任意 int 值，但内部会映射到最接近的 45 度倍数方向：
-     *              0: LEFT_RIGHT (左 -> 右)
-     *              45: BL_TR (左下 -> 右上)
-     *              90: BOTTOM_TOP (下 -> 上)
-     *              135: BR_TL (右下 -> 左上)
-     *              180: RIGHT_LEFT (右 -> 左)
-     *              225: TR_BL (右上 -> 左下)
-     *              270: TOP_BOTTOM (上 -> 下)
-     *              315: TL_BR (左上 -> 右下)
+     * Set linear gradient background
+     * @param startColor Gradient start color
+     * @param endColor Gradient end color
+     * @param angle Gradient angle. Although any int value is supported, it is internally mapped to the nearest 45-degree multiple direction:
+     *              0: LEFT_RIGHT (Left -> Right)
+     *              45: BL_TR (Bottom Left -> Top Right)
+     *              90: BOTTOM_TOP (Bottom -> Top)
+     *              135: BR_TL (Bottom Right -> Top Left)
+     *              180: RIGHT_LEFT (Right -> Left)
+     *              225: TR_BL (Top Right -> Bottom Left)
+     *              270: TOP_BOTTOM (Top -> Bottom)
+     *              315: TL_BR (Top Left -> Bottom Right)
      */
     public ViewBackgroundJavaBuilder setGradient(int startColor, int endColor, int angle) {
         if (startColor != 0 && endColor != 0) {
@@ -166,7 +166,7 @@ public class ViewBackgroundJavaBuilder {
             colorMap.add(new ColorData(new int[]{android.R.attr.state_pressed}, pressedColor));
             hasColor = true;
         }
-        if (disabledColor != noColor) { //-代表false
+        if (disabledColor != noColor) { // - represents false
             colorMap.add(new ColorData(new int[]{-android.R.attr.state_enabled}, disabledColor));
             hasColor = true;
         }
@@ -196,7 +196,7 @@ public class ViewBackgroundJavaBuilder {
         }
 
         GradientDrawable it = new GradientDrawable();
-        //背景
+        // Background
         if (mGradientStartColor != 0 && mGradientEndColor != 0) {
             it.setColors(new int[]{mGradientStartColor, mGradientEndColor});
             it.setOrientation(getGradientOrientation(mGradientAngle));
@@ -205,19 +205,19 @@ public class ViewBackgroundJavaBuilder {
             it.setColor(mBg);
         }
 
-        //圆角
+        // Corner radius
         if (mCorner instanceof CornerRadius.AllCornerRadius) {
             it.setCornerRadius(((CornerRadius.AllCornerRadius) mCorner).size);
         } else if (mCorner instanceof CornerRadius.EachCornerRadius) {
             it.setCornerRadii(((CornerRadius.EachCornerRadius) mCorner).convert());
         }
 
-        //边框
+        // Stroke
         if (mStrokeWidth > 0 && mStrokeColor != 0) {
             it.setStroke((int) mStrokeWidth, mStrokeColor);
         }
 
-        //形状 RECTANGLE, OVAL, LINE, RING
+        // Shape RECTANGLE, OVAL, LINE, RING
 //        switch (mShape) {
 //            case 0: it.setShape(GradientDrawable.RECTANGLE); break;
 //            case 1: it.setShape(GradientDrawable.OVAL); break;
@@ -260,7 +260,7 @@ public class ViewBackgroundJavaBuilder {
     }
 
     /**
-     * 对任何view设置RippleColor颜色
+     * Set RippleColor for any drawable
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public static Drawable setRippleColor(Drawable drawable, @ColorInt int rippleColor, Integer radius) {
@@ -284,7 +284,7 @@ public class ViewBackgroundJavaBuilder {
     }
 
     /**
-     * 对任何view设置RippleColor颜色
+     * Set RippleColor for any view
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public static void setRippleColor(View view, @ColorInt int rippleColor, Integer radius) {
