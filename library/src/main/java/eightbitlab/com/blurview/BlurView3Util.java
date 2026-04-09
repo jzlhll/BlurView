@@ -49,9 +49,28 @@ public class BlurView3Util {
      * @param legacyBgColor Legacy fallback color
      */
     public void setBlur(BlurTarget target, int legacyBgColor) {
+        setBlurWithOverlay(target, false, 0, legacyBgColor);
+    }
+
+
+    /**
+     * Set standard blur
+     *
+     * @param target Blur target
+     * @param overlayColor Overlay color
+     * @param legacyBgColor Legacy fallback color
+     */
+    public void setBlurWithOverlay(BlurTarget target, int overlayColor, int legacyBgColor) {
+        setBlurWithOverlay(target, true, overlayColor, legacyBgColor);
+    }
+
+    private void setBlurWithOverlay(BlurTarget target, boolean hasOverlayColor, int overlayColor, int legacyBgColor) {
         if (!isLegacy) {
             blurView.setupWith(target)
                     .setBlurRadius(blurRadius);
+            if (hasOverlayColor) {
+                blurView.setOverlayColor(overlayColor);
+            }
             blurView.setOutlineProvider(viewOutlineProvider);
             blurView.setClipToOutline(true);
         } else {
@@ -76,11 +95,34 @@ public class BlurView3Util {
      */
     public void setProgressiveBlur(BlurTarget target, int direction, boolean applyNoise,
                                    int legacyBgStartColor, int legacyBgEndColor) {
+        setProgressiveBlurWithOverlay(target, direction, applyNoise, false, 0, legacyBgStartColor, legacyBgEndColor);
+    }
+
+    /**
+     * Set progressive blur with overlay
+     *
+     * @param direction Blur direction
+     * @param applyNoise Whether to apply noise, false is recommended, otherwise there will be a visible boundary
+     * @param overlayColor  -
+     * @param legacyBgStartColor Legacy fallback start color
+     * @param legacyBgEndColor Legacy fallback end color
+     */
+    public void setProgressiveBlurWithOverlay(BlurTarget target, int direction, boolean applyNoise,
+                                              int overlayColor,
+                                              int legacyBgStartColor, int legacyBgEndColor) {
+        setProgressiveBlurWithOverlay(target, direction, applyNoise, true, overlayColor, legacyBgStartColor, legacyBgEndColor);
+    }
+
+    private void setProgressiveBlurWithOverlay(BlurTarget target, int direction, boolean applyNoise,
+                                              boolean hasOverlayColor, int overlayColor,
+                                              int legacyBgStartColor, int legacyBgEndColor) {
         if (!isLegacy) {
             blurView.setupWith(target, BlurController.DEFAULT_SCALE_FACTOR, applyNoise)
                     .setBlurGradient(direction)
                     .setBlurRadius(blurRadius);
-
+            if (hasOverlayColor) {
+                blurView.setOverlayColor(overlayColor);
+            }
             blurView.setOutlineProvider(viewOutlineProvider);
             blurView.setClipToOutline(true);
         } else {
