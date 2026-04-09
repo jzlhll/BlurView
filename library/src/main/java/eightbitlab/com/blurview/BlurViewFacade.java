@@ -45,4 +45,15 @@ public interface BlurViewFacade {
      * @return {@link BlurViewFacade}
      */
     BlurViewFacade setOverlayColor(@ColorInt int overlayColor);
+
+    /**
+     * Sets the direction of the progressive blur gradient.
+     * The blur will fade out in the specified direction.
+     *
+     * @param direction one of {@link BlurView#GRADIENT_TOP_TO_BOTTOM}, {@link BlurView#GRADIENT_BOTTOM_TO_TOP},
+     *                  {@link BlurView#GRADIENT_LEFT_TO_RIGHT}, {@link BlurView#GRADIENT_RIGHT_TO_LEFT},
+     *                  or {@link BlurView#GRADIENT_NONE}
+     * @return {@link BlurViewFacade}
+     */
+    BlurViewFacade setBlurGradient(int direction);
 }

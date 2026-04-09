@@ -1,12 +1,11 @@
 package eightbitlab.com.blurview;
 
 import static eightbitlab.com.blurview.BlurController.DEFAULT_SCALE_FACTOR;
-import static eightbitlab.com.blurview.PreDrawBlurController.TRANSPARENT;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.FrameLayout;
@@ -14,18 +13,22 @@ import android.widget.FrameLayout;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
-import com.eightbitlab.blurview.R;
-
 /**
  * FrameLayout that blurs its underlying content.
  * Can have children and draw them over blurred background.
  */
 public class BlurView extends FrameLayout {
 
+    public static final int GRADIENT_NONE = 0;
+    public static final int GRADIENT_TOP_TO_BOTTOM = 1;
+    public static final int GRADIENT_BOTTOM_TO_TOP = 2;
+    public static final int GRADIENT_LEFT_TO_RIGHT = 3;
+    public static final int GRADIENT_RIGHT_TO_LEFT = 4;
+
     BlurController blurController = new NoOpController();
 
     @ColorInt
-    private int overlayColor;
+    private int overlayColor = Color.TRANSPARENT;
     private boolean blurAutoUpdate = true;
 
     public BlurView(Context context) {
@@ -44,9 +47,6 @@ public class BlurView extends FrameLayout {
     }
 
     private void init(AttributeSet attrs, int defStyleAttr) {
-        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.BlurView, defStyleAttr, 0);
-        overlayColor = a.getColor(R.styleable.BlurView_blurOverlayColor, TRANSPARENT);
-        a.recycle();
     }
 
     @Override
@@ -163,6 +163,13 @@ public class BlurView extends FrameLayout {
      */
     public BlurViewFacade setBlurEnabled(boolean enabled) {
         return blurController.setBlurEnabled(enabled);
+    }
+
+    /**
+     * @see BlurViewFacade#setBlurGradient(int)
+     */
+    public BlurViewFacade setBlurGradient(int direction) {
+        return blurController.setBlurGradient(direction);
     }
 
     @Override

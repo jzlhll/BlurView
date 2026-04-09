@@ -26,6 +26,11 @@ public class NoOpController implements BlurController {
     }
 
     @Override
+    public BlurViewFacade setBlurGradient(int direction) {
+        return this;
+    }
+
+    @Override
     public BlurViewFacade setOverlayColor(int overlayColor) {
         return this;
     }
