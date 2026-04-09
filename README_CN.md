@@ -8,6 +8,7 @@
 
 - **渐变模糊 (Gradient/Progressive Blur)**：支持有方向的模糊渐变（例如从上到下、从左到右），使模糊部分和清晰部分之间的过渡更加自然。
 - **`BlurView3Util` 工具类**：用于快速设置常规模糊或渐变模糊，并自动为旧版 Android（API < 31 / Android 12）提供后备的纯色或渐变色背景处理。
+- **叠加色 (Overlay) 支持**：支持在常规模糊或渐变模糊上叠加一层颜色。
 
 ## 使用方法
 
@@ -42,37 +43,57 @@
     android:layout_height="120dp" /> 
 ```
 
-### 2. 使用 BlurView3Util 配置
+### 2. 使用 BlurView3Util 配置与效果测试
 
-初始化 `BlurView3Util` 工具类并应用所需的模糊效果。该工具会自动为 API < 31 (Android 12) 的设备提供降级背景支持。
+初始化 `BlurView3Util` 工具类并应用所需的模糊效果。下面列出了四种常见的设置方式及其测试效果评估。该工具会自动为 API < 31 (Android 12) 的设备提供降级背景支持。
 
-#### 常规模糊
+#### A. 常规模糊
 
-```java
-BlurTarget blurTarget = findViewById(R.id.blurTarget);
-BlurView blurView = findViewById(R.id.blurView);
-
-// 初始化工具类，传入 BlurView、圆角大小(dp) 和 模糊半径
-BlurView3Util blurUtil = new BlurView3Util(blurView, 16, 20f);
-
-// 应用常规模糊，并为旧设备提供一个降级的背景色
-blurUtil.setBlur(blurTarget, Color.parseColor("#80000000"));
+```kotlin
+// 测试了：blurView，圆角，模糊半径，过时的替代颜色
+BlurView3Util(binding.blurView, 16, 3f).setBlur(
+    binding.blurTarget, 
+    Color.parseColor("#ccffffff")
+)
 ```
 
-#### 渐变模糊 / 渐进模糊
+#### B. 带有叠加色的常规模糊 (推荐)
 
-```java
-BlurTarget blurTarget = findViewById(R.id.blurTarget);
-BlurView blurView2 = findViewById(R.id.blurView2);
+```kotlin
+// 测试了：blurView，圆角，模糊半径，追加overlayColor
+// 结果：效果还不错，值得推荐
+BlurView3Util(binding.blurView, 16, 3f).setBlurWithOverlay(
+    binding.blurTarget, 
+    Color.parseColor("#20000000"), // overlayColor
+    Color.parseColor("#ccffffff")  // legacyBgColor
+)
+```
 
-BlurView3Util progressiveBlurUtil = new BlurView3Util(blurView2, 0, 20f);
+#### C. 渐变模糊 / 渐进模糊
 
-// 应用渐变模糊，并为旧设备提供降级的渐变背景色
-progressiveBlurUtil.setProgressiveBlur(
-    blurTarget, 
-    BlurView.GRADIENT_TOP_TO_BOTTOM, // 模糊渐变方向
-    false,                           // applyNoise (建议传 false 以避免明显的噪点边界)
-    Color.parseColor("#80000000"),   // 旧设备的降级起始颜色
-    Color.TRANSPARENT                // 旧设备的降级结束颜色
-);
+```kotlin
+// 测试了：渐变模糊效果
+// 结果：applyNoise 推荐传 false，否则可能会有明显的分界线
+BlurView3Util(binding.blurView, 0, 16f).setProgressiveBlur(
+    binding.blurTarget, 
+    BlurView.GRADIENT_TOP_TO_BOTTOM, 
+    false, // applyNoise (建议传 false)
+    Color.parseColor("#ccffffff"), // 旧设备的降级起始颜色
+    Color.parseColor("#00ffffff")  // 旧设备的降级结束颜色
+)
+```
+
+#### D. 带有叠加色的渐变模糊 (不推荐)
+
+```kotlin
+// 测试了：渐变模糊，追加overlayColor
+// 结果：视觉效果较差，不推荐在渐变模糊上追加 overlayColor
+BlurView3Util(binding.blurView, 0, 16f).setProgressiveBlurWithOverlay(
+    binding.blurTarget, 
+    BlurView.GRADIENT_TOP_TO_BOTTOM, 
+    false, 
+    Color.parseColor("#20000000"), // overlayColor
+    Color.parseColor("#ccffffff"), 
+    Color.parseColor("#00ffffff")
+)
 ```

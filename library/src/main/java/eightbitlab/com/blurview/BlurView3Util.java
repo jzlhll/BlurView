@@ -100,6 +100,7 @@ public class BlurView3Util {
 
     /**
      * Set progressive blur with overlay
+     * After testing: It looks not so good with overlay color.
      *
      * @param direction Blur direction
      * @param applyNoise Whether to apply noise, false is recommended, otherwise there will be a visible boundary
