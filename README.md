@@ -2,6 +2,8 @@
 
 [中文版 README_CN.md](README_CN.md)
 
+todo: Progressive Blur with Overlay: overlay color also has linear transparency.
+
 Cloned from [Dimezis/BlurView](https://github.com/Dimezis/BlurView) with added support for **Gradient/Progressive Blur** and a new utility class **`BlurView3Util`** for easier setup and backward compatibility.
 
 ## Dependency
