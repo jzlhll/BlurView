@@ -49,9 +49,18 @@ public class BlurView3Util {
      * @param legacyBgColor Legacy fallback color
      */
     public void setBlur(BlurTarget target, int legacyBgColor) {
-        setBlurWithOverlay(target, false, 0, legacyBgColor);
+        setBlurWithOverlay(target, false, 0, legacyBgColor, true);
     }
 
+    /**
+     * Set standard blur with no noise
+     *
+     * @param target Blur target
+     * @param legacyBgColor Legacy fallback color
+     */
+    public void setBlurNoNoise(BlurTarget target, int legacyBgColor) {
+        setBlurWithOverlay(target, false, 0, legacyBgColor, false);
+    }
 
     /**
      * Set standard blur
@@ -61,12 +70,12 @@ public class BlurView3Util {
      * @param legacyBgColor Legacy fallback color
      */
     public void setBlurWithOverlay(BlurTarget target, int overlayColor, int legacyBgColor) {
-        setBlurWithOverlay(target, true, overlayColor, legacyBgColor);
+        setBlurWithOverlay(target, true, overlayColor, legacyBgColor, true);
     }
 
-    private void setBlurWithOverlay(BlurTarget target, boolean hasOverlayColor, int overlayColor, int legacyBgColor) {
+    private void setBlurWithOverlay(BlurTarget target, boolean hasOverlayColor, int overlayColor, int legacyBgColor, boolean applyNoise) {
         if (!isLegacy) {
-            blurView.setupWith(target)
+            blurView.setupWith(target, BlurController.DEFAULT_SCALE_FACTOR, applyNoise)
                     .setBlurRadius(blurRadius);
             if (hasOverlayColor) {
                 blurView.setOverlayColor(overlayColor);

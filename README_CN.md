@@ -67,7 +67,17 @@ BlurView3Util(binding.blurView, 16, 3f).setBlur(
 )
 ```
 
-#### B. 带有叠加色的常规模糊 (推荐)
+#### B. 常规模糊 (无噪点)
+
+```kotlin
+// 测试了：无噪点的常规模糊
+BlurView3Util(binding.blurView, 16, 3f).setBlurNoNoise(
+    binding.blurTarget, 
+    Color.parseColor("#ccffffff")
+)
+```
+
+#### C. 带有叠加色的常规模糊 (推荐)
 
 ```kotlin
 // 测试了：blurView，圆角，模糊半径，追加overlayColor
@@ -79,7 +89,7 @@ BlurView3Util(binding.blurView, 16, 3f).setBlurWithOverlay(
 )
 ```
 
-#### C. 渐变模糊 / 渐进模糊
+#### D. 渐变模糊 / 渐进模糊
 
 ```kotlin
 // 测试了：渐变模糊效果
@@ -93,7 +103,7 @@ BlurView3Util(binding.blurView, 0, 16f).setProgressiveBlur(
 )
 ```
 
-#### D. 带有叠加色的渐变模糊 (不推荐)
+#### E. 带有叠加色的渐变模糊 (不推荐)
 
 ```kotlin
 // 测试了：渐变模糊，追加overlayColor

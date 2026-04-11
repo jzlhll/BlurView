@@ -69,7 +69,17 @@ BlurView3Util(binding.blurView, 16, 3f).setBlur(
 )
 ```
 
-#### B. Standard Blur with Overlay (Recommended)
+#### B. Standard Blur (No Noise)
+
+```kotlin
+// Tested: standard blur without noise applied
+BlurView3Util(binding.blurView, 16, 3f).setBlurNoNoise(
+    binding.blurTarget, 
+    Color.parseColor("#ccffffff")
+)
+```
+
+#### C. Standard Blur with Overlay (Recommended)
 
 ```kotlin
 // Tested: blurView, corner radius, blur radius, overlayColor
@@ -81,7 +91,7 @@ BlurView3Util(binding.blurView, 16, 3f).setBlurWithOverlay(
 )
 ```
 
-#### C. Progressive / Gradient Blur
+#### D. Progressive / Gradient Blur
 
 ```kotlin
 // Tested: Progressive blur fading
@@ -95,7 +105,7 @@ BlurView3Util(binding.blurView, 0, 16f).setProgressiveBlur(
 )
 ```
 
-#### D. Progressive Blur with Overlay (Not Recommended)
+#### E. Progressive Blur with Overlay (Not Recommended)
 
 ```kotlin
 // Tested: Progressive blur + overlayColor
