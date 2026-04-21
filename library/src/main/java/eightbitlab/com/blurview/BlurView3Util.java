@@ -73,6 +73,10 @@ public class BlurView3Util {
         setBlurWithOverlay(target, true, overlayColor, legacyBgColor, true);
     }
 
+    public void setBlurWithOverlayNoNoise(BlurTarget target, int overlayColor, int legacyBgColor) {
+        setBlurWithOverlay(target, true, overlayColor, legacyBgColor, false);
+    }
+
     private void setBlurWithOverlay(BlurTarget target, boolean hasOverlayColor, int overlayColor, int legacyBgColor, boolean applyNoise) {
         if (!isLegacy) {
             blurView.setupWith(target, BlurController.DEFAULT_SCALE_FACTOR, applyNoise)
